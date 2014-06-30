@@ -1,4 +1,7 @@
 python_buzz
 ===========
 
-Python Library to handle Buzz! controllers
+Python Library to handle PS2 USB Buzz! controllers
+
+
+

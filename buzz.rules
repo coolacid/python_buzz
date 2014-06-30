@@ -1,0 +1,6 @@
+SUBSYSTEM !="usb_device", ACTION !="add", GOTO="device_rules_end"
+
+# ID 054c:1000 Sony Corp. Wireless Buzz! Receiver
+ATTR{idVendor}=="054c" , ATTR{idProduct}=="1000", MODE="0666"
+
+LABEL="device_rules_end"
