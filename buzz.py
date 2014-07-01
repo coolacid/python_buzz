@@ -21,7 +21,6 @@ class buzz:
 	    self.kerneldriver = False
 
 	self.device.set_configuration()
-	self.device.reset()
 	usb.util.claim_interface(self.device, self.interface)
 	cfg = self.device.get_active_configuration()
 	self.endpoint = cfg[(0,0)][0]
@@ -41,20 +40,17 @@ class buzz:
 	self.lights[1] = 0xFF if control & 2 else 0x00
 	self.lights[2] = 0xFF if control & 4 else 0x00
 	self.lights[3] = 0xFF if control & 8 else 0x00
-	self.device.ctrl_transfer(0x0, 265, 0,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3]])
+	self.device.ctrl_transfer(0x21, 0x09, 0x0200,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3],0x0,0x0])
 
     def readcontroller(self):
 	try: 
 	    cfg = self.device.get_active_configuration()
 	    self.endpoint = cfg[(0,0)][0]
-	    print self.endpoint.bEndpointAddress
 	    data = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
 	except usb.core.USBError as e: 
 	    if e[0] != 110:
 		traceback.print_exc(file=sys.stdout)
 	    data = None
-	if data != None:
-	    print self.endpoint.bEndpointAddress
 	return data
 
     def readlights(self):
@@ -64,11 +60,11 @@ class buzz:
 
 if __name__=='__main__':
     buzz = buzz()
-    for x in range(2):
+    for x in range(16):
 	buzz.setlights(x)
-        time.sleep(1)
+	time.sleep(1)
     buzz.setlights(0)
-#    while True:
-    r = buzz.readcontroller()
-#	if r != None:
-#	    print r
+    while True:
+	r = buzz.readcontroller()
+	if r != None:
+	    print r
