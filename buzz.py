@@ -41,18 +41,13 @@ class buzz:
 	self.lights[1] = 0xFF if control & 2 else 0x00
 	self.lights[2] = 0xFF if control & 4 else 0x00
 	self.lights[3] = 0xFF if control & 8 else 0x00
-	#5 9 261 265 517 521 773 777
 	self.device.ctrl_transfer(0x0, 265, 0,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3]])
-	#for x in range(1000):
-	#    try:
-	#	self.device.ctrl_transfer(0x0, x, 0,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3]])
-	#	print x
-	#    except usb.core.USBError as e: 
-	#	pass
-		#print e
 
     def readcontroller(self):
 	try: 
+	    cfg = self.device.get_active_configuration()
+	    self.endpoint = cfg[(0,0)][0]
+	    print self.endpoint.bEndpointAddress
 	    data = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
 	except usb.core.USBError as e: 
 	    if e[0] != 110:
@@ -69,14 +64,11 @@ class buzz:
 
 if __name__=='__main__':
     buzz = buzz()
-    for x in range(15):
+    for x in range(2):
 	buzz.setlights(x)
         time.sleep(1)
     buzz.setlights(0)
-#    buzz.setlights(1)
-#    buzz.setlights(2)
-#    buzz.setlights(3)
 #    while True:
-#	r = buzz.readcontroller()
+    r = buzz.readcontroller()
 #	if r != None:
 #	    print r
