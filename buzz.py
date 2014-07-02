@@ -49,7 +49,12 @@ class buzz:
 	self.lights[3] = 0xFF if control & 8 else 0x00
 	self.device.ctrl_transfer(0x21, 0x09, 0x0200,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3],0x0,0x0])
 
-    def fliplight(self):
+    def setlight(self, controller, state=False):
+	# Sets a light on or off for a single controller
+	self.lights[controller] = 0xFF if state else 0x00
+	self.device.ctrl_transfer(0x21, 0x09, 0x0200,0,[0x0,self.lights[0],self.lights[1],self.lights[2],self.lights[3],0x0,0x0])
+
+    def fliplight(self, controller):
 	# Flips the state of a controllers light
 	# TODO
 	pass
