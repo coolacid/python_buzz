@@ -11,6 +11,7 @@ class buzz:
 	self.device = usb.core.find(idVendor=0x054c, idProduct=0x1000)
 	self.interface = 0
 	self.lights = [0,0,0,0]
+	self.buttons = [{'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}]
 	if self.device is None:
 	    raise ValueError('Device not found')
 
@@ -50,21 +51,54 @@ class buzz:
 	except usb.core.USBError as e: 
 	    if e[0] != 110:
 		traceback.print_exc(file=sys.stdout)
+		# TODO: Should probably raise an error here, as it's something unexpected.
 	    data = None
 	return data
 
+    def parsecontroller(self, data):
+	# Function to parse the results of readcontroller
+	# We break this out incase someone else wants todo something different
+	# Controller 1
+	self.buttons[0]["red"] =    True if data[2] & 1 else False
+	self.buttons[0]["yellow"] = True if data[2] & 2 else False
+	self.buttons[0]["green"] =  True if data[2] & 4 else False
+	self.buttons[0]["orange"] = True if data[2] & 8 else False
+	self.buttons[0]["blue"] =   True if data[2] & 16 else False
+
+	self.buttons[1]["red"] =    True if data[2] & 32 else False
+	self.buttons[1]["yellow"] = True if data[2] & 64 else False
+	self.buttons[1]["green"] =  True if data[2] & 128 else False
+	self.buttons[1]["orange"] = True if data[3] & 1 else False
+	self.buttons[1]["blue"] =   True if data[3] & 2 else False
+
+	self.buttons[2]["red"] =    True if data[3] & 4 else False
+	self.buttons[2]["yellow"] = True if data[3] & 8 else False
+	self.buttons[2]["green"] =  True if data[3] & 16 else False
+	self.buttons[2]["orange"] = True if data[3] & 32 else False
+	self.buttons[2]["blue"] =   True if data[3] & 64 else False
+
+	self.buttons[3]["red"] =    True if data[3] & 128 else False
+	self.buttons[3]["yellow"] = True if data[4] & 1 else False
+	self.buttons[3]["green"] =  True if data[4] & 2 else False
+	self.buttons[3]["orange"] = True if data[4] & 4 else False
+	self.buttons[3]["blue"] =   True if data[4] & 8 else False
+
+	return self.buttons
+
     def readlights(self):
-	
+	# TODO: Should return what the state of self.lights
 	print (self.controller.leds(verbose=True))
 	
 
 if __name__=='__main__':
     buzz = buzz()
-    for x in range(16):
-	buzz.setlights(x)
-	time.sleep(1)
-    buzz.setlights(0)
+#    for x in range(16):
+#	buzz.setlights(x)
+#	time.sleep(1)
+    buzz.setlights(8)
     while True:
 	r = buzz.readcontroller()
 	if r != None:
+	    q = buzz.parsecontroller(r)
 	    print r
+	    print q
