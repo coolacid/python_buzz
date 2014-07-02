@@ -54,13 +54,13 @@ class buzz:
 	# TODO
 	pass
 
-    def readcontroller(self, raw = False):
+    def readcontroller(self, raw = False, timeout = None):
 	# Reads the controller
 	# Returns the result of Parsecontroller (the changed bit) or raw
 	try: 
 	    cfg = self.device.get_active_configuration()
 	    self.endpoint = cfg[(0,0)][0]
-	    data = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize)
+	    data = self.device.read(self.endpoint.bEndpointAddress, self.endpoint.wMaxPacketSize, timeout=timeout)
 	    parsed = self.parsecontroller(data)
 	except usb.core.USBError as e: 
 	    if e[0] != 110:
@@ -74,7 +74,7 @@ class buzz:
     def parsecontroller(self, data):
 	# Function to parse the results of readcontroller
 	# We break this out incase someone else wants todo something different
-	# Returns the changed bit
+	# Returns the changed bits
 
 	# Controller 1
 	self.buttons[0]["red"] =    True if data[2] & 1 else False
@@ -125,9 +125,9 @@ if __name__=='__main__':
 #    for x in range(16):
 #	buzz.setlights(x)
 #	time.sleep(1)
-    buzz.setlights(8)
+    buzz.setlights(1)
     while True:
-	r = buzz.readcontroller()
+	r = buzz.readcontroller(timeout=500)
 	if r != None:
 	    print bin(r)
 #	    print buzz.getbuttons()
