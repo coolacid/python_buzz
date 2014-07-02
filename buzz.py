@@ -12,6 +12,7 @@ class buzz:
 	self.interface = 0
 	self.lights = [0,0,0,0]
 	self.buttons = [{'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}, {'red':0, 'yellow':0, 'green':0, 'orange':0, 'blue':0}]
+	self.bits = 0
 	if self.device is None:
 	    raise ValueError('Device not found')
 
@@ -103,8 +104,12 @@ class buzz:
 	self.buttons[3]["orange"] = True if data[4] & 4 else False
 	self.buttons[3]["blue"] =   True if data[4] & 8 else False
 
-	# TODO: Track and report what changed. 
-	return self.buttons
+	oldbits = self.bits
+	self.bits = (data[4] << 16) + (data[3] << 8) + data[2]
+
+	changed = oldbits | self.bits
+
+	return changed
 
     def getbuttons(self):
 	# Returns current state of buttons
@@ -120,9 +125,9 @@ if __name__=='__main__':
 #    for x in range(16):
 #	buzz.setlights(x)
 #	time.sleep(1)
-    buzz.setlights(0)
+    buzz.setlights(8)
     while True:
-	r = buzz.readcontroller(True)
+	r = buzz.readcontroller()
 	if r != None:
-	    print r
-	    print buzz.getbuttons()
+	    print bin(r)
+#	    print buzz.getbuttons()
